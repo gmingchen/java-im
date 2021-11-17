@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slipper.service.friendGroup.dao.FriendGroupDao">
+
+    <resultMap id="FriendGroupMap" type="com.slipper.service.friendGroup.dto.FriendGroupDto">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="userId" column="user_id"/>
+        <result property="canDeleted" column="can_deleted"/>
+        <result property="createdAt" column="created_at"/>
+        <collection property="friends" ofType="com.slipper.service.friend.dto.FriendDto">
+            <id property="id" column="friend_id"/>
+            <result property="remark" column="remark"/>
+            <result property="groupId" column="group_id"/>
+            <result property="status" column="status"/>
+            <result property="userId" column="friend_user_id"/>
+            <result property="username" column="username"/>
+            <result property="nickname" column="nickname"/>
+            <result property="avatar" column="avatar"/>
+            <result property="sex" column="sex"/>
+        </collection>
+    </resultMap>
+<!--    List<FriendGroupDto> queryGroupFriend(@Param("userId") Long userId);-->
+    <select id="queryGroupFriend" resultMap="FriendGroupMap">
+        select fg.id, fg.name, fg.user_id, fg.can_deleted, fg.created_at,
+               f.id as friend_id, f.remark, f.group_id, f.status,
+               u.id as friend_user_id, u.username, u.nickname, u.avatar, u.sex
+        from friend_group fg
+        left join friend f on f.group_id = fg.id and f.status = 1
+        left join user u on u.id = f.friend_id
+        where fg.user_id = #{userId}
+        order by fg.created_at asc
+    </select>
+</mapper>

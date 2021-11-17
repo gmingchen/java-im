@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slipper.service.friend.dao.FriendDao">
+<!--    List<FriendDto> queryFriendByGroupId(@Param("groupId") Long groupId);-->
+    <select id="queryFriendByGroupId" resultType="com.slipper.service.friend.dto.FriendDto">
+        select f.id, f.remark, f.group_id, f.status,
+               u.id as user_id, u.username, u.nickname, u.avatar, u.sex
+        from friend f
+                 left join user u on u.id = f.friend_id
+        where f.group_id = #{groupId} and f.status = 1
+    </select>
+
+    <resultMap id="ApplyMap" type="com.slipper.service.friend.dto.ApplyDto">
+        <id property="id" column="id"/>
+        <result property="remark" column="remark"/>
+        <result property="groupId" column="group_id"/>
+        <result property="status" column="status"/>
+        <association property="reviewer" javaType="com.slipper.service.user.dto.UserBasicDto">
+            <id property="id" column="reviewer_id"/>
+            <result property="username" column="reviewer_username"/>
+            <result property="nickname" column="reviewer_nickname"/>
+            <result property="avatar" column="reviewer_avatar"/>
+            <result property="sex" column="reviewer_sex"/>
+            <result property="mobile" column="reviewer_mobile"/>
+        </association>
+        <association property="applicant" javaType="com.slipper.service.user.dto.UserBasicDto">
+            <id property="id" column="applicant_id"/>
+            <result property="username" column="applicant_username"/>
+            <result property="nickname" column="applicant_nickname"/>
+            <result property="avatar" column="applicant_avatar"/>
+            <result property="sex" column="applicant_sex"/>
+            <result property="mobile" column="applicant_mobile"/>
+        </association>
+    </resultMap>
+<!--    List<ApplyDto> queryFriendApply(Long userId);-->
+    <select id="queryFriendApply" resultMap="ApplyMap">
+        select f.id, f.remark, f.group_id, f.status,
+               reviewer.id as reviewer_id, reviewer.username as reviewer_username, reviewer.nickname as reviewer_nickname,
+               reviewer.avatar as reviewer_avatar, reviewer.sex as reviewer_sex, reviewer.mobile as reviewer_mobile,
+               applicant.id as applicant_id, applicant.username as applicant_username, applicant.nickname as applicant_nickname,
+               applicant.avatar as applicant_avatar, applicant.sex as applicant_sex, applicant.mobile as applicant_mobile
+        from friend as f
+                 left join user as reviewer on reviewer.id = f.friend_id
+                 left join user as applicant on applicant.id = f.user_id
+        where f.status in (0, 2)
+          and ( f.user_id = #{userId} or f.friend_id = #{userId} )
+    </select>
+</mapper>

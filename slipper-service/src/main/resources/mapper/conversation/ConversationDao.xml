@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.slipper.service.conversation.dao.ConversationDao">
+    <resultMap id="ConversationMap" type="com.slipper.service.conversation.dto.ConversationDto">
+        <id property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="unreadCount" column="unread_count"/>
+        <result property="createdAt" column="created_at"/>
+        <association property="from" javaType="com.slipper.service.user.dto.UserBasicDto">
+            <id property="id" column="sender_id"/>
+            <result property="username" column="sender_username"/>
+            <result property="nickname" column="sender_nickname"/>
+            <result property="avatar" column="sender_avatar"/>
+            <result property="sex" column="sender_sex"/>
+            <result property="mobile" column="sender_mobile"/>
+        </association>
+        <association property="to" javaType="com.slipper.service.user.dto.UserBasicDto">
+            <id property="id" column="recipient_id"/>
+            <result property="username" column="recipient_username"/>
+            <result property="nickname" column="recipient_nickname"/>
+            <result property="avatar" column="recipient_avatar"/>
+            <result property="sex" column="recipient_sex"/>
+            <result property="mobile" column="recipient_mobile"/>
+        </association>
+        <association property="message" javaType="com.slipper.service.message.dto.PrivateMessageDto">
+            <id property="id" column="message_id" jdbcType="BIGINT"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="from" column="message_sender_id" jdbcType="BIGINT"/>
+            <result property="to" column="message_recipient_id" jdbcType="BIGINT"/>
+            <result property="type" column="message_type" jdbcType="INTEGER"/>
+            <result property="status" column="status" jdbcType="TINYINT"/>
+            <result property="createdAt" column="message_created_at" jdbcType="BIGINT"/>
+            <result property="url" column="url" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+<!--    List<ConversationDto> queryList(@Param("userId") Long userId);-->
+    <select id="queryList" resultMap="ConversationMap">
+        select c.id, c.type, c.created_at,
+               sender.id as sender_id, sender.username as sender_username, sender.nickname as sender_nickname,
+               sender.avatar as sender_avatar, sender.sex as sender_sex, sender.mobile as sender_mobile,
+               recipient.id as recipient_id, recipient.username as recipient_username, recipient.nickname as recipient_nickname,
+               recipient.avatar as recipient_avatar, recipient.sex as recipient_sex, recipient.mobile as recipient_mobile,
+               m.id as message_id, m.content, m.from as message_sender_id, m.to as message_recipient_id, m.status, m.type as message_type,
+               m.url, m.created_at as message_created_at,
+               (
+                select count(0) from message as mess where mess.status = 0 and mess.from = recipient_id and mess.to = sender_id
+               ) as unread_count
+        from conversation c
+            left join user as sender on sender.id = c.from
+            left join user as recipient on recipient.id = c.to
+            left join message as m on m.id = (
+                select id
+                from message message
+                where (message.from = c.from and message.to = c.to) or (message.to = c.from and message.from = c.to)
+                order by message.created_at desc
+                limit 0,1
+            )
+        where c.from = #{userId}
+        order by m.created_at desc
+    </select>
+
+<!--    ConversationDto queryById(@Param("id") Long id);-->
+    <select id="queryById" resultMap="ConversationMap">
+        select c.id, c.type, c.created_at,
+               sender.id as sender_id, sender.username as sender_username, sender.nickname as sender_nickname,
+               sender.avatar as sender_avatar, sender.sex as sender_sex, sender.mobile as sender_mobile,
+               recipient.id as recipient_id, recipient.username as recipient_username, recipient.nickname as recipient_nickname,
+               recipient.avatar as recipient_avatar, recipient.sex as recipient_sex, recipient.mobile as recipient_mobile,
+               m.id as message_id, m.content, m.from as message_sender_id, m.to as message_recipient_id, m.status, m.type as message_type,
+               m.url, m.created_at as message_created_at,
+               (
+                   select count(0) from message as mess where mess.status = 0 and mess.from = recipient_id and mess.to = sender_id
+               ) as unread_count
+        from conversation c
+             left join user as sender on sender.id = c.from
+             left join user as recipient on recipient.id = c.to
+             left join message as m on m.id = (
+                select id
+                from message message
+                where (message.from = c.from and message.to = c.to) or (message.to = c.from and message.from = c.to)
+                order by message.created_at desc
+                limit 0,1
+            )
+        where c.id = #{id}
+    </select>
+</mapper>

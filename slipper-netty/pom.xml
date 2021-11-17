@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>im-java</artifactId>
+        <groupId>com.slipper</groupId>
+        <version>1.0.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>slipper-netty</artifactId>
+
+    <description>netty</description>
+
+    <dependencies>
+        <!--Netty-->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+        </dependency>
+        <!--MessagePack 序列化-->
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>msgpack</artifactId>
+        </dependency>
+
+        <!-- 核心 -->
+        <dependency>
+            <groupId>com.slipper</groupId>
+            <artifactId>slipper-core</artifactId>
+        </dependency>
+
+        <!-- 服务 -->
+        <dependency>
+            <groupId>com.slipper</groupId>
+            <artifactId>slipper-service</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
