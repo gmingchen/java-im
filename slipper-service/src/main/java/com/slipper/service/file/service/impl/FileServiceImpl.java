@@ -27,7 +27,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileEntity create(MultipartFile file) {
-        FileEntity fileEntity = setFileEntity(file, "http://139.196.182.46:8800", "images");
+        FileEntity fileEntity = setFileEntity(file, "http://resource.gumingchen.icu", "images");
         Boolean bool = FileUtils.save(file, "/home/static/images/" + fileEntity.getActual());
         if (!bool) {
             throw new RunException("文件上传失败!");
