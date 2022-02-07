@@ -7,16 +7,16 @@ service:
   context-path: /slipper
 
 database:
-  ip: 139.196.182.46
+  ip: localhost
   port: 3306
   name: im
   username: root
-  password: ll5271211314
+  password: 123456
 
 druid:
   url-pattern: /druid/*
-  username: gumingchen
-  password: gumingchen
+  username:
+  password:
 
 token:
   expire: 36000
